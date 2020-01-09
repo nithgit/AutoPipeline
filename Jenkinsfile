@@ -5,6 +5,16 @@ pipeline {
     tools {
         maven 'localmaven'
     }
+    
+    parameters {
+        string(name: 'tomcat_stg', default_value: 'localhost:8090', description: 'staging server')
+        string(name: 'tomcat_prod', default_value: 'localhost:9090', description: 'production server')
+    }
+
+    triggers {
+        pollSCM('* * * * *')
+    }
+    
     stages{
         stage('Build'){
             steps {
@@ -17,31 +27,19 @@ pipeline {
                 }
             }
         }
-        stage ('Deploy to Staging'){
-            steps {
-                build job: 'Deploy-to-staging'
+        stage ('Deployments') {
+	    parallel{
+	        stage ('Deploy to Staging'){
+	            steps {
+		        bat "**target/*.war /c/users/500983245/apache-tomcat-8.5.50-stg/webapps"
+                    }
+                }
+	        stage ('Deploy to Production'){
+                    steps {
+		        bat "**target/*.war /c/users/500983245/apache-tomcat-8.5.50-prd/webapps"
+		    }
+                }
             }
         }
-	stage ('Deploy to Production'){
-            steps {
-                timeout(time:5, unit:'DAYS'){
-		    input message:'Approve PRODUCTION Deployment?'
-		}
-
-		build job: 'Deploy-to-prod'
-
-            }
-	    post {
-	        success {
-		    echo 'Code deployed to Production.'
-		}
-
-		failure {
-		    echo ' Deployment failed'
-		}
-	    }
-        }
-
     }
 }
-
