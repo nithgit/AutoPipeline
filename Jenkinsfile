@@ -31,12 +31,12 @@ pipeline {
 	    parallel{
 	        stage ('Deploy to Staging'){
 	            steps {
-		        bat "copy **target/*.war /c/users/500983245/apache-tomcat-8.5.50-stg/webapps"
+		        bat "copy **target/*.war C:\Users\500983245\apache-tomcat-8.5.50-stg\webapps"
                     }
                 }
 	        stage ('Deploy to Production'){
                     steps {
-		        bat "copy **target/*.war /c/users/500983245/apache-tomcat-8.5.50-prd/webapps"
+		        bat "copy **target/*.war C:\Users\500983245\apache-tomcat-8.5.50-prd\webapps"
 		    }
                 }
             }
